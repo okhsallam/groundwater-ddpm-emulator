@@ -1,0 +1,64 @@
+# "Modified" configuration (2026-10-01).
+#
+# The point of this variant is a strict provenance rule for everything the model
+# is conditioned on during an autoregressive rollout. Each conditioning channel
+# must be one of:
+#   (a) static data        -- terrain and soil hydraulic properties, which are
+#                             INPUTS to ParFlow, not things it computes
+#   (b) atmospheric forcing -- NLDAS-2 reanalysis, available operationally
+#   (c) the model's own prediction, or the single day-0 initial condition
+#
+# Two channels present in earlier runs break that rule and are removed here:
+#
+#   evapotranspiration, snowmelt  -- ParFlow-CLM OUTPUTS, previously re-read from
+#       the archive at every hop for the days being forecast. Evapotranspiration
+#       is a function of soil moisture, which is a forecast target, so this also
+#       leaked information about the future state. NLDAS-2 has no equivalent
+#       (it is a purely atmospheric product), so they are dropped rather than
+#       substituted.
+#
+#   pressure_head in the init block -- held at its day-0 value through the whole
+#       rollout, it becomes stale and inconsistent with the predicted state it is
+#       paired with, a combination the model never saw in training.
+#
+# Conditioning: 22 static + 2 init + 15x3 forcing = 69 channels (was 104).
+# No re-download or re-tiling is needed: forcing channels are selected by name
+# from archives that already contain all five.
+data:
+  size: [256, 256]
+  resolution: 1000
+
+  tiles_root: "../data/tiles"
+  normalization_stats: "../data/norm/normalization_stats_fold1.json"
+  residual_normalization_stats: "../data/norm/residual_stats_fold1_flen15.json"
+  train_years: [2003, 2004, 2005]
+  val_years: []
+  test_years: [2006]
+  forcing_set: "nldas"        # tmin, tmax, precipitation only
+
+model:
+  future_len: 15
+  include_pressure_head: false      # not a forecast target
+  include_pressure_in_init: false   # and not in the conditioning either
+  channels_output: 30               # 15 x 2
+  channels_static: 22
+  channels_init: 2                  # water_table_depth, soil_moisture
+  channels_forcing: 45              # 15 x 3
+
+  dim: 32
+  timesteps: 100
+  dim_mults: [1, 2, 4, 8]
+  objective: 'pred_v'
+
+training:
+  batch_size: 4
+  num_epochs: 200
+  num_workers: 8
+  lr: 0.00005
+  target_mode: "residual"
+  use_validation: false
+
+save:
+  directory: "Results/"
+  checkpoint_save_freq: 25
+  inference_freq: 10

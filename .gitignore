@@ -1,0 +1,29 @@
+# data and model outputs -- none of this belongs in the repository
+data/
+Results/
+outputs/
+report_full/
+figures/
+*.npz
+*.nc
+*.pt
+*.pth
+*.pkl
+
+# run artefacts
+*.o[0-9]*
+*.e[0-9]*
+*.log
+submit_when_ready.log
+
+# credentials -- never commit these
+.cdsapirc
+.netrc
+.env
+*.pem
+
+# python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+*.bak

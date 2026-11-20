@@ -1,0 +1,48 @@
+# Leave-one-water-year-out, fold 3: train [2003, 2005, 2006], test WY2004.
+#
+# Conditioning is restricted so that nothing the model sees during a rollout is
+# an output of the simulator it is emulating. Each channel is either static data
+# (terrain and soil hydraulic properties, which are ParFlow INPUTS), NLDAS-2
+# atmospheric forcing, or the model's own prediction -- plus the single day-0
+# initial condition. Evapotranspiration and snowmelt (ParFlow-CLM outputs) and
+# the frozen pressure head are excluded.
+#
+# Conditioning: 22 static + 2 init + 15x3 forcing = 69 channels.
+data:
+  size: [256, 256]
+  resolution: 1000
+
+  tiles_root: "../data/tiles"
+  normalization_stats: "../data/norm/normalization_stats_fold3.json"
+  residual_normalization_stats: "../data/norm/residual_stats_fold3_flen15.json"
+  train_years: [2003, 2005, 2006]
+  val_years: []
+  test_years: [2004]
+  forcing_set: "nldas"
+
+model:
+  future_len: 15
+  include_pressure_head: false
+  include_pressure_in_init: false
+  channels_output: 30
+  channels_static: 22
+  channels_init: 2
+  channels_forcing: 45
+
+  dim: 32
+  timesteps: 100
+  dim_mults: [1, 2, 4, 8]
+  objective: 'pred_v'
+
+training:
+  batch_size: 4
+  num_epochs: 200
+  num_workers: 8
+  lr: 0.00005
+  target_mode: "residual"
+  use_validation: false
+
+save:
+  directory: "Results/"
+  checkpoint_save_freq: 25
+  inference_freq: 10

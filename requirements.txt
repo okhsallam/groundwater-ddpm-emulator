@@ -1,0 +1,23 @@
+# Core model, training and inference
+torch
+torchvision
+accelerate
+einops
+ema-pytorch
+numpy
+scipy
+pyyaml
+tqdm
+
+# Data access and handling
+xarray
+netCDF4
+pandas
+hf_hydrodata      # ParFlow-CLM CONUS1 output, static fields and NLDAS-2 via HydroData (registration required)
+cdsapi            # SEAS5 from the Copernicus Climate Data Store (CDS credentials required)
+requests
+
+# Figures
+matplotlib
+cartopy
+shapely

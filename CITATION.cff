@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "groundwater-ddpm-emulator: a conditional diffusion emulator of ParFlow-CLM groundwater dynamics"
+type: software
+license: MIT
+repository-code: "https://github.com/okhsallam/groundwater-ddpm-emulator"
+authors:
+  - family-names: Sallam
+    given-names: Omar
+  - family-names: Condon
+    given-names: Laura E.
+  - family-names: Maxwell
+    given-names: Reed M.
+  - family-names: Feinstein
+    given-names: Jeremy
+  - family-names: Coe
+    given-names: David
+  - family-names: Hadley Raymond
+    given-names: Daniel
+  - family-names: Abrams
+    given-names: Daniel
+  - family-names: Iordache
+    given-names: Vlad
+  - family-names: Yan
+    given-names: Eugene
+keywords:
+  - groundwater
+  - soil moisture
+  - diffusion model
+  - emulator
+  - ParFlow
+  - seasonal forecasting
