@@ -9,8 +9,43 @@ One call of the model generates 15 days from a single initial state. Chaining
 24 calls autoregressively produces a 360-day forecast of a full water year, so
 the same model serves medium-range and seasonal forecasting.
 
-This repository contains **only source code**. No data, trained weights or
-figures are included; see [Data](#data) for where each input comes from.
+This repository contains **source code only**: no data or trained weights are
+included (see [Data](#data) for where each input comes from). The three
+overview figures below are taken from the accompanying paper.
+
+---
+
+## Overview
+
+### Model architecture
+
+![Architecture of one call of the conditional DDPM emulator](docs/images/unet_architecture.png)
+
+One call of the emulator. The noised residual of water table depth and soil
+moisture over *L* = 15 lead days is denoised over *T* = 100 diffusion steps by a
+four-level U-Net (32, 64, 128 and 256 channels). The diffusion step enters
+through a sinusoidal embedding and a two-layer perceptron, applied as a
+per-channel scale and shift in every residual block. The 69 conditioning
+channels (static fields, initial state and forcing) are mapped by four 1 × 1
+convolution projections and added to the features at each encoder level and at
+the bottleneck, which shares the deepest projection. The prediction is added to
+the initial state and projected onto the physically admissible range.
+
+### Autoregressive forecasting
+
+![Autoregressive forecasting strategy](docs/images/autoregressive_rollout.png)
+
+A single call gives a 15-day medium-range forecast. Chaining 24 calls, each
+initialised from the last predicted day of the previous one and fed the next
+15 days of precipitation and minimum and maximum temperature, gives a 360-day
+seasonal forecast. Only the first call receives a ParFlow state.
+
+### Study domain
+
+![Study domain](docs/images/study_domain.png)
+
+The 637 × 665 km subdomain of the ParFlow–CLM CONUS1 grid in the central US
+Midwest, with its elevation and topographic index at 1 km resolution.
 
 ---
 
